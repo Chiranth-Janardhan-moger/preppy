@@ -57,10 +57,35 @@ const HERO_IMAGES = [
 export const HeroSection: React.FC = () => {
   const { navigateTo } = useShop();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const validHeroImages = HERO_IMAGES.filter(i => Boolean(i.img));
+  const [allHeroSlides, setAllHeroSlides] = useState<{ img: string; alt: string; tag: string }[]>(HERO_IMAGES);
 
   useEffect(() => {
+    async function loadDynamicHeroImages() {
+      try {
+        const { fetchAdminImages } = await import('../../lib/supabase');
+        const dynamicImages = await fetchAdminImages();
+        const uploadedHeroes = dynamicImages
+          .filter(item => item.targetSection === 'hero' && Boolean(item.url))
+          .map(item => ({
+            img: item.url,
+            alt: item.title || 'PREPPY Couture',
+            tag: item.title || 'Maison PREPPY'
+          }));
+
+        if (uploadedHeroes.length > 0) {
+          setAllHeroSlides([...uploadedHeroes, ...HERO_IMAGES]);
+        }
+      } catch (err) {
+        console.warn('Failed loading dynamic hero images:', err);
+      }
+    }
+    loadDynamicHeroImages();
+  }, []);
+
+  const validHeroImages = allHeroSlides.filter(i => Boolean(i.img));
+
+  useEffect(() => {
+    if (validHeroImages.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % validHeroImages.length);
     }, 7000);
