@@ -56,7 +56,7 @@ export const FeaturedCollections: React.FC = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: index * 0.15 }}
             onClick={() => navigateTo('category', { category: collection.category })}
-            className="group relative rounded-xl overflow-hidden cursor-pointer bg-stone-200 dark:bg-neutral-900 shadow-xl border border-transparent hover:border-[#C5A880]/40 transition-all duration-500 aspect-[4/5] md:aspect-[3/4]"
+            className="group relative rounded-xl overflow-hidden cursor-pointer bg-stone-200 dark:bg-neutral-900 shadow-xl border border-transparent hover:border-[#C5A880]/40 transition-all duration-500 aspect-[4/3] sm:aspect-[4/3.2] md:aspect-[4/3.2]"
           >
             {/* Image */}
             <img
