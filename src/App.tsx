@@ -28,13 +28,8 @@ import { AboutPage } from './components/pages/AboutPage';
 import { FAQPage } from './components/pages/FAQPage';
 import { ContactPage } from './components/pages/ContactPage';
 
-// Lazy-loaded Admin Module
-const AdminLoginPage = React.lazy(() =>
-  import('./components/pages/AdminLoginPage').then(m => ({ default: m.AdminLoginPage }))
-);
-const AdminDashboardPage = React.lazy(() =>
-  import('./components/pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage }))
-);
+import { AdminLoginPage } from './components/pages/AdminLoginPage';
+import { AdminDashboardPage } from './components/pages/AdminDashboardPage';
 
 const AppContent: React.FC = () => {
   const { pageView, isAdminLoggedIn } = useShop();
@@ -70,10 +65,8 @@ const AppContent: React.FC = () => {
         {pageView === 'faq' && <FAQPage />}
         {pageView === 'contact' && <ContactPage />}
         
-        <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-xs font-semibold uppercase tracking-widest text-[#C5A880]">Loading Admin Portal...</div>}>
-          {pageView === 'admin-login' && <AdminLoginPage />}
-          {pageView === 'admin' && (isAdminLoggedIn ? <AdminDashboardPage /> : <AdminLoginPage />)}
-        </React.Suspense>
+        {pageView === 'admin-login' && <AdminLoginPage />}
+        {pageView === 'admin' && (isAdminLoggedIn ? <AdminDashboardPage /> : <AdminLoginPage />)}
       </main>
 
       {/* Global Drawers & Modals */}

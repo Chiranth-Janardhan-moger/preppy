@@ -1,36 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import hero1 from '../../assets/hero-1.png';
 import hero2 from '../../assets/hero-2.png';
 import hero3 from '../../assets/hero-3.png';
+import hero4 from '../../assets/hero-4.png';
+import hero5 from '../../assets/hero-5.png';
+import hero6 from '../../assets/hero-6.png';
+import hero7 from '../../assets/hero-7.png';
+import hero8 from '../../assets/hero-8.png';
 
 const HERO_IMAGES = [
   {
-    img:hero1,
+    img: hero1,
     alt: 'PREPPY White Silk Haute Couture Collection',
     tag: 'Maison PREPPY Haute Couture',
   },
   {
-    img:hero2,
+    img: hero2,
     alt: 'PREPPY Royal Blue Velvet & Silk Couture',
     tag: 'Royal Sapphire Midnight Collection',
   },
   {
-    img:hero3,
+    img: hero3,
     alt: 'PREPPY Bronze & Chocolate Velvet Haute Couture',
     tag: 'Imperial Amber & Bronze Velvet Line',
   },
   {
-    img:"",
+    img: hero4,
     alt: 'PREPPY Royal Emerald Silk & Velvet Couture',
     tag: 'Imperial Emerald Heritage Line',
   },
   {
-    img:"",
+    img: hero5,
     alt: 'PREPPY Rosé Quartz & Champagne Silk Gown',
     tag: 'Rose Quartz Gala Atelier Capsule',
+  },
+  {
+    img: hero6,
+    alt: 'PREPPY Midnight Obsidian Silk Collection',
+    tag: 'Midnight Obsidian Edition',
+  },
+  {
+    img: hero7,
+    alt: 'PREPPY Golden Hour Silk Ensemble',
+    tag: 'Golden Hour Atelier Line',
+  },
+  {
+    img: hero8,
+    alt: 'PREPPY Ivory Elegance Couture',
+    tag: 'Ivory Elegance Heritage Capsule',
   },
 ];
 
@@ -108,20 +128,6 @@ export const HeroSection: React.FC = () => {
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </motion.div>
-      </div>
-
-      {/* Slide Navigation Dots */}
-      <div className="absolute bottom-8 right-8 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-        {validHeroImages.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentImageIndex(idx)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              currentImageIndex === idx ? 'w-6 bg-[#C5A880]' : 'w-2 bg-white/50 hover:bg-white'
-            }`}
-            aria-label={`Go to slide ${idx + 1}`}
-          />
-        ))}
       </div>
     </section>
   );
