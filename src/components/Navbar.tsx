@@ -217,32 +217,6 @@ export const Navbar: React.FC = () => {
 
                 {/* Navigation Links */}
                 <div className="flex flex-col flex-1 gap-4 text-xs font-semibold uppercase tracking-wider">
-                  {/* Mobile Collections Menu */}
-                  <div className="pb-6 border-b border-stone-100 dark:border-neutral-800">
-                    <p className="text-[10px] uppercase tracking-widest text-stone-500 px-3 pb-4 font-bold">
-                      Collections
-                    </p>
-                    <div className="grid grid-cols-2 gap-3">
-                      {CATEGORIES_LIST.slice(0, 4).map(cat => (
-                        <button
-                          key={cat.name}
-                          onClick={() => handleCategoryClick(cat.name as CategoryType)}
-                          className="flex flex-col items-center justify-center p-3 rounded-2xl bg-stone-100 dark:bg-neutral-900 hover:bg-[#C5A880]/10 transition-all text-center gap-2"
-                        >
-                          <img
-                            src={cat.image}
-                            alt={cat.name}
-                            referrerPolicy="no-referrer"
-                            className="w-16 h-16 rounded-full object-cover shadow-sm"
-                          />
-                          <span className="text-[10px] font-semibold text-stone-800 dark:text-stone-200">
-                            {cat.name}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   <div className="flex flex-col gap-1">
                     <button
                       onClick={() => {
