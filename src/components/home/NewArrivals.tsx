@@ -81,7 +81,7 @@ export const NewArrivals: React.FC = () => {
         {/* Horizontal Scrollable Product Carousel */}
         <div
           ref={carouselRef}
-          className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pt-1 pb-4 px-1 snap-x snap-mandatory"
+          className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pt-1 pb-4 px-1 snap-x snap-proximity touch-pan-x touch-pan-y overscroll-x-contain"
         >
           {products.map(product => {
             const inWish = isInWishlist(product.id);
