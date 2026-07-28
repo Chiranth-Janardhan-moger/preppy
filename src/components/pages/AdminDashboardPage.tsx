@@ -13,7 +13,10 @@ import { AdminImage } from '../../types';
 import { 
   fetchAdminImages, 
   uploadImageToStorage, 
-  deleteImageFromStorage 
+  deleteImageFromStorage,
+  getSupabaseCredentials,
+  saveSupabaseCredentials,
+  getSupabaseClient
 } from '../../lib/supabase';
 
 export const AdminDashboardPage: React.FC = () => {
@@ -35,6 +38,26 @@ export const AdminDashboardPage: React.FC = () => {
   const [subtitle, setSubtitle] = useState<string>('Artisan Atelier Special');
   const [isUploading, setIsUploading] = useState(false);
   const [filterSection, setFilterSection] = useState<string>('all');
+
+  // Supabase Credentials State
+  const initialCreds = getSupabaseCredentials();
+  const [spUrl, setSpUrl] = useState(initialCreds.url);
+  const [spAnonKey, setSpAnonKey] = useState(initialCreds.anonKey);
+  const [showConfigDrawer, setShowConfigDrawer] = useState(!initialCreds.url);
+
+  const isSupabaseConnected = Boolean(getSupabaseClient());
+
+  const handleSaveCredentials = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!spUrl.trim() || !spAnonKey.trim()) {
+      showToast('Please enter both Supabase URL and Anon Key.', 'error');
+      return;
+    }
+    saveSupabaseCredentials(spUrl, spAnonKey);
+    showToast('Supabase credentials saved! Connecting...', 'success');
+    setShowConfigDrawer(false);
+    loadImages();
+  };
 
   const loadImages = async () => {
     try {
@@ -177,6 +200,73 @@ export const AdminDashboardPage: React.FC = () => {
               <span>Logout</span>
             </button>
           </div>
+        </div>
+
+        {/* Supabase Connection Status Card */}
+        <div className="bg-white dark:bg-neutral-900 border border-stone-200 dark:border-neutral-800 rounded-2xl p-4 sm:p-6 shadow-md space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-3 h-3 rounded-full shrink-0 ${isSupabaseConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-stone-800 dark:text-stone-200">
+                  Supabase Connection: {isSupabaseConnected ? 'Connected (Cloud Active)' : 'Not Connected'}
+                </h3>
+                <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                  {isSupabaseConnected 
+                    ? `Connected to ${spUrl || 'environment variables'}. Uploaded images save to public cloud storage.` 
+                    : 'To upload files on live Vercel deployments, enter your Supabase URL & Anon Key below or set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel Environment Variables.'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowConfigDrawer(prev => !prev)}
+              className="text-xs text-[#C5A880] font-semibold hover:underline self-start sm:self-center"
+            >
+              {showConfigDrawer ? 'Hide Credentials Settings' : 'Configure Supabase Keys'}
+            </button>
+          </div>
+
+          {showConfigDrawer && (
+            <form onSubmit={handleSaveCredentials} className="pt-4 border-t border-stone-200 dark:border-neutral-800 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 block">
+                    Supabase Project URL
+                  </label>
+                  <input
+                    type="url"
+                    value={spUrl}
+                    onChange={e => setSpUrl(e.target.value)}
+                    placeholder="https://your-project-id.supabase.co"
+                    className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#C5A880]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 block">
+                    Supabase Anon Key
+                  </label>
+                  <input
+                    type="password"
+                    value={spAnonKey}
+                    onChange={e => setSpAnonKey(e.target.value)}
+                    placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#C5A880]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-[#C5A880] hover:bg-[#a88b60] text-black text-xs font-bold uppercase tracking-wider rounded-xl transition-colors shadow-sm"
+                >
+                  Save &amp; Connect Supabase
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         {/* Upload Form Card */}

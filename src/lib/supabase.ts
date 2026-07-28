@@ -309,37 +309,12 @@ export async function uploadImageToStorage(
       }
     }
 
-    // If Supabase client was present but all bucket uploads failed, throw the error!
     if (lastError) {
-      throw new Error(`Supabase Storage Error: ${lastError.message || 'Bucket not found or permission denied. Please create a public bucket named "home" in Supabase Dashboard.'}`);
+      throw new Error(`Supabase Upload Failed: ${lastError.message || 'Bucket "home" not found or permission denied. Please create a public bucket named "home" in your Supabase Dashboard.'}`);
     }
   }
 
-  // Fallback to FileReader only when no Supabase client is configured
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const dataUrl = reader.result as string;
-      const fallbackItem: AdminImage = {
-        id: `loc-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-        url: dataUrl,
-        title: title || file.name,
-        bucket: 'home-local',
-        filePath: fileName,
-        targetSection,
-        targetCategory,
-        displayPrice: extraMeta?.displayPrice,
-        actualPrice: extraMeta?.actualPrice,
-        rating: extraMeta?.rating,
-        badgeText: extraMeta?.badgeText,
-        createdAt: new Date().toISOString()
-      };
-      await syncToLocalCache(fallbackItem);
-      resolve(fallbackItem);
-    };
-    reader.onerror = error => reject(error);
-    reader.readAsDataURL(file);
-  });
+  throw new Error('Supabase Storage is not connected. Please enter your Supabase URL & Anon Key in the Admin Section or add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel Environment Variables.');
 }
 
 export async function deleteImageFromStorage(image: AdminImage): Promise<void> {
