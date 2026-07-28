@@ -7,15 +7,9 @@ import {
   Currency, 
   PageView, 
   UserProfile, 
-  ProductColor,
-  AdminImage
+  ProductColor
 } from '../types';
 import { PRODUCTS, CURRENCY_RATES } from '../data/mockData';
-import { 
-  fetchAdminImages, 
-  uploadImageToStorage, 
-  deleteImageFromStorage 
-} from '../lib/supabase';
 
 interface Toast {
   id: string;
@@ -69,14 +63,10 @@ interface ShopContextType {
   recentlyViewed: Product[];
   addRecentlyViewed: (product: Product) => void;
 
-  // Admin & Supabase Storage state
+  // Admin Auth state
   isAdminLoggedIn: boolean;
   adminLogin: (passcode: string) => boolean;
   adminLogout: () => void;
-  adminImages: AdminImage[];
-  loadAdminImages: () => Promise<void>;
-  uploadAdminImage: (file: File, title: string, targetSection?: 'hero' | 'banner' | 'gallery' | 'collection') => Promise<AdminImage>;
-  deleteAdminImage: (image: AdminImage) => Promise<void>;
 }
 
 const defaultUser: UserProfile = {
@@ -179,21 +169,10 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile>(defaultUser);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  // Admin Auth & Storage state
+  // Admin Auth state
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
     return localStorage.getItem('preppy_admin_session') === 'true';
   });
-  const [adminImages, setAdminImages] = useState<AdminImage[]>([]);
-
-  const loadAdminImages = async () => {
-    try {
-      const images = await fetchAdminImages();
-      setAdminImages(Array.isArray(images) ? images : []);
-    } catch (e) {
-      console.error('Failed to load admin images:', e);
-      setAdminImages([]);
-    }
-  };
 
   const adminLogin = (passcode: string): boolean => {
     if (passcode === 'preppy2026' || passcode === 'admin123' || passcode === 'admin') {
@@ -210,23 +189,6 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAdminLoggedIn(false);
     localStorage.removeItem('preppy_admin_session');
     showToast('Admin session logged out', 'info');
-  };
-
-  const uploadAdminImage = async (
-    file: File, 
-    title: string, 
-    targetSection: 'hero' | 'banner' | 'gallery' | 'collection' = 'hero'
-  ): Promise<AdminImage> => {
-    const uploaded = await uploadImageToStorage(file, title, targetSection);
-    setAdminImages(prev => [uploaded, ...prev]);
-    showToast(`Image "${uploaded.title}" uploaded successfully!`, 'success');
-    return uploaded;
-  };
-
-  const deleteAdminImage = async (image: AdminImage): Promise<void> => {
-    await deleteImageFromStorage(image);
-    setAdminImages(prev => prev.filter(img => img.id !== image.id));
-    showToast(`Image deleted successfully from Storage`, 'info');
   };
 
   // Persist cart & wishlist
@@ -443,11 +405,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addRecentlyViewed,
         isAdminLoggedIn,
         adminLogin,
-        adminLogout,
-        adminImages,
-        loadAdminImages,
-        uploadAdminImage,
-        deleteAdminImage
+        adminLogout
       }}
     >
       {children}

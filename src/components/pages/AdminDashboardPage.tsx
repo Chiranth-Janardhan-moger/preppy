@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Upload, 
@@ -15,18 +15,19 @@ import {
 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import { AdminImage } from '../../types';
-import { getSupabaseCredentials, saveSupabaseCredentials } from '../../lib/supabase';
+import { 
+  getSupabaseCredentials, 
+  saveSupabaseCredentials, 
+  fetchAdminImages, 
+  uploadImageToStorage, 
+  deleteImageFromStorage 
+} from '../../lib/supabase';
 
 export const AdminDashboardPage: React.FC = () => {
-  const { 
-    adminImages, 
-    uploadAdminImage, 
-    deleteAdminImage, 
-    adminLogout, 
-    loadAdminImages,
-    navigateTo,
-    showToast 
-  } = useShop();
+  const { adminLogout, navigateTo, showToast } = useShop();
+
+  // Self-contained admin image state (not from ShopContext)
+  const [adminImages, setAdminImages] = useState<AdminImage[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -43,8 +44,18 @@ export const AdminDashboardPage: React.FC = () => {
   const [supabaseUrl, setSupabaseUrl] = useState(initialCreds.url);
   const [supabaseAnonKey, setSupabaseAnonKey] = useState(initialCreds.anonKey);
 
-  React.useEffect(() => {
-    loadAdminImages();
+  const loadImages = async () => {
+    try {
+      const images = await fetchAdminImages();
+      setAdminImages(Array.isArray(images) ? images : []);
+    } catch (e) {
+      console.error('Failed to load admin images:', e);
+      setAdminImages([]);
+    }
+  };
+
+  useEffect(() => {
+    loadImages();
   }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +88,9 @@ export const AdminDashboardPage: React.FC = () => {
 
     try {
       setIsUploading(true);
-      await uploadAdminImage(selectedFile, imageTitle, targetSection);
+      const uploaded = await uploadImageToStorage(selectedFile, imageTitle, targetSection);
+      setAdminImages(prev => [uploaded, ...prev]);
+      showToast(`Image "${uploaded.title}" uploaded successfully!`, 'success');
       setSelectedFile(null);
       setFilePreviewUrl(null);
       setImageTitle('');
@@ -86,6 +99,16 @@ export const AdminDashboardPage: React.FC = () => {
       showToast(`Upload error: ${err.message || 'Failed to upload'}`, 'error');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleDeleteImage = async (image: AdminImage) => {
+    try {
+      await deleteImageFromStorage(image);
+      setAdminImages(prev => prev.filter(img => img.id !== image.id));
+      showToast('Image deleted successfully from Storage', 'info');
+    } catch (err) {
+      showToast('Failed to delete image', 'error');
     }
   };
 
@@ -101,7 +124,7 @@ export const AdminDashboardPage: React.FC = () => {
     saveSupabaseCredentials(supabaseUrl, supabaseAnonKey);
     setIsConfigOpen(false);
     showToast('Supabase API credentials saved successfully!', 'success');
-    loadAdminImages();
+    loadImages();
   };
 
   const filteredImages = (adminImages || []).filter(img => {
@@ -140,7 +163,7 @@ export const AdminDashboardPage: React.FC = () => {
             </button>
 
             <button
-              onClick={() => loadAdminImages()}
+              onClick={() => loadImages()}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 hover:border-[#C5A880] transition-colors shadow-sm"
               title="Refresh images list"
             >
@@ -385,7 +408,7 @@ export const AdminDashboardPage: React.FC = () => {
                     </a>
 
                     <button
-                      onClick={() => deleteAdminImage(img)}
+                      onClick={() => handleDeleteImage(img)}
                       className="p-2 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 rounded-xl transition-colors"
                       title="Delete image from storage"
                     >
