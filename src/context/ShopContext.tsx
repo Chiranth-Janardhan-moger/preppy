@@ -188,9 +188,10 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadAdminImages = async () => {
     try {
       const images = await fetchAdminImages();
-      setAdminImages(images);
+      setAdminImages(Array.isArray(images) ? images : []);
     } catch (e) {
       console.error('Failed to load admin images:', e);
+      setAdminImages([]);
     }
   };
 

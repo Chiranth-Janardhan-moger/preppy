@@ -18,9 +18,9 @@ export function saveSupabaseCredentials(url: string, anonKey: string) {
 
 export function getSupabaseClient(): SupabaseClient | null {
   const { url, anonKey } = getSupabaseCredentials();
-  if (url && anonKey) {
+  if (url && anonKey && typeof url === 'string' && url.trim().startsWith('http')) {
     try {
-      return createClient(url, anonKey);
+      return createClient(url.trim(), anonKey.trim());
     } catch (err) {
       console.error('Failed to initialize Supabase client:', err);
     }
