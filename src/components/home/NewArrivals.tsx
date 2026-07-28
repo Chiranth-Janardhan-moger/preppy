@@ -60,7 +60,7 @@ export const NewArrivals: React.FC = () => {
             </h2>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             <button
               onClick={() => scroll('left')}
               className="p-3 rounded-full bg-white dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 hover:border-[#C5A880] transition-colors shadow-sm"
