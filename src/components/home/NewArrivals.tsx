@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { Star, Eye, ShoppingBag, Sparkles, ArrowRight } from 'lucide-react';
+import { Star, Eye, ShoppingBag, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import { PRODUCTS } from '../../data/mockData';
 import { Product } from '../../types';
+import { fetchAdminImages, mapAdminImagesToProducts } from '../../lib/supabase';
 
 export const NewArrivals: React.FC = () => {
   const { 
@@ -16,7 +17,34 @@ export const NewArrivals: React.FC = () => {
   } = useShop();
 
   const carouselRef = useRef<HTMLDivElement>(null);
-  const products = PRODUCTS;
+  const [uploadedProducts, setUploadedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function loadUploaded() {
+      try {
+        const adminImgs = await fetchAdminImages();
+        setUploadedProducts(mapAdminImagesToProducts(adminImgs, 'up-prod'));
+      } catch (e) {
+        console.error('Error loading uploaded images for NewArrivals:', e);
+      }
+    }
+    loadUploaded();
+  }, []);
+
+  useEffect(() => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollLeft = 0;
+    }
+  }, [uploadedProducts]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      const scrollAmount = direction === 'left' ? -350 : 350;
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const products = [...uploadedProducts, ...PRODUCTS];
 
   return (
     <section className="py-24 bg-stone-100/70 dark:bg-neutral-900/40 border-y border-[#C5A880]/20">
@@ -32,17 +60,32 @@ export const NewArrivals: React.FC = () => {
             </h2>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => scroll('left')}
+              className="p-3 rounded-full bg-white dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 hover:border-[#C5A880] transition-colors shadow-sm"
+              title="Scroll left"
+            >
+              <ChevronLeft className="w-4 h-4 text-stone-700 dark:text-stone-300" />
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              className="p-3 rounded-full bg-white dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 hover:border-[#C5A880] transition-colors shadow-sm"
+              title="Scroll right"
+            >
+              <ChevronRight className="w-4 h-4 text-stone-700 dark:text-stone-300" />
+            </button>
           </div>
         </div>
 
         {/* Horizontal Scrollable Product Carousel */}
         <div
           ref={carouselRef}
-          className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pt-1 pb-4 px-2 -mx-2 snap-x snap-mandatory"
+          className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pt-1 pb-4 px-1 snap-x snap-mandatory"
         >
           {products.map(product => {
             const inWish = isInWishlist(product.id);
+            const topBadge = (product.tags && product.tags[2]) ? product.tags[2] : (product.isNew ? 'New' : undefined);
 
             return (
               <motion.div
@@ -72,13 +115,13 @@ export const NewArrivals: React.FC = () => {
 
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-                    {product.isNew && (
-                      <span className="bg-[#121212] text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded">
-                        New
+                    {topBadge && (
+                      <span className="bg-[#121212] text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded shadow">
+                        {topBadge}
                       </span>
                     )}
                     {product.discountPercentage && (
-                      <span className="bg-[#C5A880] text-black text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded">
+                      <span className="bg-[#C5A880] text-black text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded shadow">
                         -{product.discountPercentage}% Off
                       </span>
                     )}

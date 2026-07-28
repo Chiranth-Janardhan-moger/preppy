@@ -5,13 +5,16 @@ import reel3 from '../assets/reels/reel-3.png';
 import reel4 from '../assets/reels/reel-4.png';
 import reel5 from '../assets/reels/reel-5.png';
 import reel6 from '../assets/reels/reel-6.png';
+import sareesImg from '../assets/sarees-collection.jpg';
+import aariworkImg from '../assets/aariwork-collection.jpg';
+import accessoriesImg from '../assets/accessories-collection.jpg';
 
 
 export const CURRENCY_RATES = {
-  USD: { symbol: '$', rate: 1 },
-  EUR: { symbol: '€', rate: 0.92 },
-  GBP: { symbol: '£', rate: 0.79 },
-  INR: { symbol: '₹', rate: 83.5 },
+  INR: { symbol: '₹', rate: 1 },
+  USD: { symbol: '$', rate: 1 / 83.5 },
+  EUR: { symbol: '€', rate: 0.92 / 83.5 },
+  GBP: { symbol: '£', rate: 0.79 / 83.5 },
 };
 
 export const SAMPLE_REVIEWS: Review[] = [
@@ -366,10 +369,94 @@ export const PRODUCTS: Product[] = [
     reviewsList: SAMPLE_REVIEWS,
     sku: 'AST-J-NECK-009',
     tags: ['Jewelry', 'Diamonds', '18K Gold', 'High Jewelry']
+  },
+  {
+    id: 'ast-010',
+    name: 'Kanjivaram Royal Silk Zari Saree',
+    subtitle: 'Heritage Bridal Weaves',
+    category: 'Sarees',
+    subCategory: 'Saree',
+    price: 3450,
+    rating: 5.0,
+    reviewCount: 28,
+    isNew: true,
+    isFeatured: true,
+    isLuxury: true,
+    images: [
+      sareesImg,
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1200&q=85'
+    ],
+    colors: [
+      { name: 'Royal Crimson Gold', hex: '#8B0000' },
+      { name: 'Peacock Green', hex: '#005F56' }
+    ],
+    sizes: ['Unstitched Saree with Blouse Piece', 'Custom Stitched Blouse'],
+    fabric: 'Pure Mulberry Silk with 24K Gold Zari Border',
+    careInstructions: 'Dry clean only in protective muslin bag.',
+    description: 'A timeless heirloom handcrafted by master handloom weavers. Features grand pallu zari work and rich traditional motifs.',
+    details: [
+      'Pure Kanjivaram Mulberry Silk',
+      'Includes unstitched matching blouse fabric',
+      'Hand-woven gold zari border',
+      'Handloom Silk Mark Certified'
+    ],
+    inStock: true,
+    stockCount: 6,
+    reviewsList: SAMPLE_REVIEWS,
+    sku: 'AST-SAR-010',
+    tags: ['Sarees', 'Saree', 'Silk', 'Kanjivaram', 'Heritage']
+  },
+  {
+    id: 'ast-011',
+    name: 'Bespoke Aari Hand Embroidered Silk Blouse & Saree',
+    subtitle: 'Artisan Needlework Couture',
+    category: 'Aariwork',
+    subCategory: 'Aariwork',
+    price: 2850,
+    rating: 4.9,
+    reviewCount: 31,
+    isNew: true,
+    isFeatured: true,
+    isLuxury: true,
+    images: [
+      aariworkImg,
+      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=1200&q=85'
+    ],
+    colors: [
+      { name: 'Deep Ruby', hex: '#4A0E17' },
+      { name: 'Emerald Velvet', hex: '#0B3B26' }
+    ],
+    sizes: ['Bespoke Custom Fitting', 'S (EU 36)', 'M (EU 38)', 'L (EU 40)'],
+    fabric: 'Raw Silk with Hand Aari Needlework & Zardozi Embellishments',
+    careInstructions: 'Specialist dry clean only.',
+    description: 'Masterpiece of hand craftsmanship featuring over 60 hours of fine Aari needlework, zardozi bullion, and micro-bead embossing.',
+    details: [
+      'Intricate Aari needle hand embroidery',
+      'Zardozi and antique pearl work detailing',
+      'Padded structured fit with custom necklines',
+      'Handcrafted tassels included'
+    ],
+    inStock: true,
+    stockCount: 4,
+    reviewsList: SAMPLE_REVIEWS,
+    sku: 'AST-AARI-011',
+    tags: ['Aariwork', 'Embroidery', 'Handwork', 'Blouse', 'Couture']
   }
 ];
 
 export const CATEGORIES_LIST = [
+  {
+    name: 'Sarees',
+    image: sareesImg,
+    description: 'Handcrafted designer silk sarees, Kanjivaram weaves, and royal drapery.',
+    itemCount: '120+ Pieces'
+  },
+  {
+    name: 'Aariwork',
+    image: aariworkImg,
+    description: 'Intricate hand needlework, zardozi embroidery, and bespoke blouse motifs.',
+    itemCount: '95+ Designs'
+  },
   {
     name: 'Women',
     image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=800&q=80',
@@ -402,7 +489,7 @@ export const CATEGORIES_LIST = [
   },
   {
     name: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80',
+    image: accessoriesImg,
     description: 'Sculpted brass minaudières, silk scarves & high jewelry',
     itemCount: '120+ Pieces'
   }

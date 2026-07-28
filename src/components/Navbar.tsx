@@ -42,7 +42,7 @@ export const Navbar: React.FC = () => {
 >
 
       {/* Main Bar */}
-      <nav className="w-full px-4 md:px-12 py-3.5 bg-[#FAF8F5] text-[#121212] border-b border-[#C5A880]/30 shadow-md flex items-center justify-between">
+      <nav className="w-full px-4 md:px-12 py-3.5 bg-[#FAF8F5] text-[#121212] shadow-md flex items-center justify-between">
         {/* Left: Brand Logo in left side corner */}
         <div className="flex-1 flex items-center justify-start">
   <div
@@ -66,9 +66,6 @@ export const Navbar: React.FC = () => {
             }`}
           >
             Home
-            {pageView === 'home' && (
-              <motion.span layoutId="navIndicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8C6D3B]" />
-            )}
           </button>
 
           <button
@@ -78,11 +75,7 @@ export const Navbar: React.FC = () => {
             }`}
           >
             Shop All
-            {pageView === 'shop' && (
-              <motion.span layoutId="navIndicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8C6D3B]" />
-            )}
           </button>
-
           {/* Collections Mega Menu trigger */}
           <div 
             className="relative py-2"

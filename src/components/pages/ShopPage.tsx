@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Filter, 
@@ -16,7 +16,8 @@ import {
 import { DropdownMenu, DropdownMenuItem } from '@astryxdesign/core/DropdownMenu';
 import { useShop } from '../../context/ShopContext';
 import { PRODUCTS } from '../../data/mockData';
-import { CategoryType } from '../../types';
+import { CategoryType, Product } from '../../types';
+import { fetchAdminImages, mapAdminImagesToProducts } from '../../lib/supabase';
 
 export const ShopPage: React.FC = () => {
   const { 
@@ -34,9 +35,22 @@ export const ShopPage: React.FC = () => {
   const [priceRange, setPriceRange] = useState<number>(15000);
   const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'rating'>('featured');
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [uploadedProducts, setUploadedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function loadUploaded() {
+      try {
+        const adminImgs = await fetchAdminImages();
+        setUploadedProducts(mapAdminImagesToProducts(adminImgs, 'shop-up-prod'));
+      } catch (e) {
+        console.error('Error loading uploaded images for ShopPage:', e);
+      }
+    }
+    loadUploaded();
+  }, []);
 
   const categories: CategoryType[] = [
-    'All', 'Women', 'Ethnic', 'Wedding', 'Party Wear', 'Casual', 'Accessories', 'Luxury Collection'
+    'All', 'Sarees', 'Aariwork', 'Accessories'
   ];
 
   const resetFilters = () => {
@@ -47,12 +61,20 @@ export const ShopPage: React.FC = () => {
 
   const activeFilterCount = (selectedCategory !== 'All' ? 1 : 0) + (priceRange < 15000 ? 1 : 0);
 
+  const allProducts = useMemo(() => [...uploadedProducts, ...PRODUCTS], [uploadedProducts]);
+
   // Filter Logic
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter(p => {
-      if (selectedCategory !== 'All' && p.category !== selectedCategory) {
+    return allProducts.filter(p => {
+      if (selectedCategory !== 'All') {
         if (selectedCategory === 'Luxury Collection' && !p.isLuxury) return false;
-        if (selectedCategory !== 'Luxury Collection' && p.category !== selectedCategory) return false;
+        if (selectedCategory === 'Sarees') {
+          if (p.category !== 'Sarees' && p.subCategory !== 'Saree' && !p.tags.some(t => t.toLowerCase().includes('saree'))) return false;
+        } else if (selectedCategory === 'Aariwork') {
+          if (p.category !== 'Aariwork' && p.subCategory !== 'Aariwork' && !p.tags.some(t => t.toLowerCase().includes('aari') || t.toLowerCase().includes('embroidered') || t.toLowerCase().includes('zardozi'))) return false;
+        } else if (p.category !== selectedCategory && !p.tags.includes(selectedCategory)) {
+          return false;
+        }
       }
       if (p.price > priceRange) return false;
       return true;
@@ -62,7 +84,7 @@ export const ShopPage: React.FC = () => {
       if (sortBy === 'rating') return b.rating - a.rating;
       return 0; // default featured order
     });
-  }, [selectedCategory, priceRange, sortBy]);
+  }, [allProducts, selectedCategory, priceRange, sortBy]);
 
   return (
     <div className="pt-24 pb-28 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto space-y-12">
@@ -72,7 +94,7 @@ export const ShopPage: React.FC = () => {
           <Sparkles className="w-3.5 h-3.5" /> Haute Couture Collection
         </span>
         <h1 className="font-serif-luxury text-3xl md:text-5xl font-medium tracking-tight text-stone-900 dark:text-stone-100">
-          Signature Styles
+          Signature Collections
         </h1>
         <p className="text-xs text-stone-500 max-w-lg mx-auto leading-relaxed">
           Browse our finest silk, cotton, bridal, and festive sarees, thoughtfully crafted for every celebration.

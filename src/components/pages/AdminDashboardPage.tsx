@@ -3,9 +3,6 @@ import { motion } from 'motion/react';
 import { 
   Upload, 
   Trash2, 
-  Copy, 
-  Check, 
-  ExternalLink, 
   Image as ImageIcon, 
   LogOut, 
   RefreshCw,
@@ -29,9 +26,14 @@ export const AdminDashboardPage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null);
   const [imageTitle, setImageTitle] = useState('');
-  const [targetSection, setTargetSection] = useState<'hero' | 'banner' | 'gallery' | 'collection'>('hero');
+  const [targetSection, setTargetSection] = useState<'collection' | 'trending'>('collection');
+  const [targetCategory, setTargetCategory] = useState<'Sarees' | 'Aariwork' | 'Accessories'>('Sarees');
+  const [displayPrice, setDisplayPrice] = useState<string>('');
+  const [actualPrice, setActualPrice] = useState<string>('');
+  const [rating, setRating] = useState<string>('5.0');
+  const [badgeText, setBadgeText] = useState<string>('Trending');
+  const [subtitle, setSubtitle] = useState<string>('Artisan Atelier Special');
   const [isUploading, setIsUploading] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [filterSection, setFilterSection] = useState<string>('all');
 
   const loadImages = async () => {
@@ -48,11 +50,20 @@ export const AdminDashboardPage: React.FC = () => {
     loadImages();
   }, []);
 
+  const formatCleanTitle = (fileName: string) => {
+    const withoutExt = fileName.replace(/\.[^/.]+$/, "");
+    const stripped = withoutExt.replace(/^\d+[\s_-]*/, '').replace(/[_]/g, ' ').trim();
+    if (!stripped || /^\d+$/.test(stripped)) {
+      return "Bespoke Couture Creation";
+    }
+    return stripped;
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setSelectedFile(file);
-      setImageTitle(file.name.replace(/\.[^/.]+$/, ""));
+      setImageTitle(formatCleanTitle(file.name));
       const preview = URL.createObjectURL(file);
       setFilePreviewUrl(preview);
     }
@@ -63,7 +74,7 @@ export const AdminDashboardPage: React.FC = () => {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
       setSelectedFile(file);
-      setImageTitle(file.name.replace(/\.[^/.]+$/, ""));
+      setImageTitle(formatCleanTitle(file.name));
       const preview = URL.createObjectURL(file);
       setFilePreviewUrl(preview);
     }
@@ -78,12 +89,29 @@ export const AdminDashboardPage: React.FC = () => {
 
     try {
       setIsUploading(true);
-      const uploaded = await uploadImageToStorage(selectedFile, imageTitle, targetSection);
+      const uploaded = await uploadImageToStorage(
+        selectedFile, 
+        imageTitle, 
+        targetSection, 
+        targetSection === 'collection' ? targetCategory : undefined,
+        targetSection === 'collection' ? {
+          displayPrice: displayPrice ? Number(displayPrice) : undefined,
+          actualPrice: actualPrice ? Number(actualPrice) : undefined,
+          rating: rating ? Number(rating) : 5.0,
+          badgeText: badgeText || undefined,
+          subtitle: subtitle || undefined
+        } : undefined
+      );
       setAdminImages(prev => [uploaded, ...prev]);
       showToast(`Image "${uploaded.title}" uploaded successfully!`, 'success');
       setSelectedFile(null);
       setFilePreviewUrl(null);
       setImageTitle('');
+      setDisplayPrice('');
+      setActualPrice('');
+      setRating('5.0');
+      setBadgeText('Trending');
+      setSubtitle('Artisan Atelier Special');
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err: any) {
       showToast(`Upload error: ${err.message || 'Failed to upload'}`, 'error');
@@ -100,13 +128,6 @@ export const AdminDashboardPage: React.FC = () => {
     } catch (err) {
       showToast('Failed to delete image', 'error');
     }
-  };
-
-  const handleCopyUrl = (url: string, id: string) => {
-    navigator.clipboard.writeText(url);
-    setCopiedId(id);
-    showToast('Public Image URL copied to clipboard!', 'success');
-    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const filteredImages = (adminImages || []).filter(img => {
@@ -128,10 +149,10 @@ export const AdminDashboardPage: React.FC = () => {
               <ArrowLeft className="w-3.5 h-3.5" /> Return to Website Homepage
             </button>
             <h1 className="font-serif-luxury text-3xl md:text-4xl font-bold tracking-tight">
-              Admin Media &amp; Supabase Storage
+              Admin Section
             </h1>
             <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-              Upload images to Supabase Storage, retrieve public URLs, and manage homepage banners dynamically.
+              Upload and manage your store media images and homepage banners.
             </p>
           </div>
 
@@ -165,9 +186,9 @@ export const AdminDashboardPage: React.FC = () => {
               <Upload className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-serif-luxury text-xl font-bold">Upload New Media to Storage</h2>
+              <h2 className="font-serif-luxury text-xl font-bold">Upload New Media</h2>
               <p className="text-xs text-stone-500">
-                Select an image file. It will upload to Supabase Storage and generate a permanent public URL.
+                Select an image file to upload to your storage collection.
               </p>
             </div>
           </div>
@@ -246,12 +267,107 @@ export const AdminDashboardPage: React.FC = () => {
                     onChange={(e: any) => setTargetSection(e.target.value)}
                     className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#C5A880]"
                   >
-                    <option value="hero">Hero Slider (Homepage Main Top Banner)</option>
-                    <option value="banner">Middle Promotional Banner</option>
-                    <option value="collection">Featured Collections Banner</option>
-                    <option value="gallery">Instagram &amp; Runway Gallery</option>
+                    <option value="collection">Featured Collections</option>
+                    <option value="trending">Trending Section</option>
                   </select>
                 </div>
+
+                {targetSection === 'collection' && (
+                  <>
+                    <div className="space-y-1.5 pt-1">
+                      <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                        4. Select Collection Category
+                      </label>
+                      <select
+                        value={targetCategory}
+                        onChange={(e: any) => setTargetCategory(e.target.value)}
+                        className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#C5A880]"
+                      >
+                        <option value="Sarees">Sarees</option>
+                        <option value="Aariwork">Aariwork</option>
+                        <option value="Accessories">Accessories</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                        Product Subtitle / Tagline
+                      </label>
+                      <input
+                        type="text"
+                        value={subtitle}
+                        onChange={(e) => setSubtitle(e.target.value)}
+                        placeholder="e.g. Artisan Atelier Special or Handcrafted Silk Edition"
+                        className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#C5A880]"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                          Display Price (Sale ₹)
+                        </label>
+                        <input
+                          type="number"
+                          value={displayPrice}
+                          onChange={(e) => setDisplayPrice(e.target.value)}
+                          placeholder="e.g. 2450"
+                          className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#C5A880]"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                          Actual Price (Original ₹)
+                        </label>
+                        <input
+                          type="number"
+                          value={actualPrice}
+                          onChange={(e) => setActualPrice(e.target.value)}
+                          placeholder="e.g. 3950"
+                          className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#C5A880]"
+                        />
+                      </div>
+                    </div>
+
+                    {actualPrice && displayPrice && Number(actualPrice) > Number(displayPrice) && (
+                      <p className="text-[11px] text-[#C5A880] font-semibold">
+                        Discount Preview: -{Math.round(((Number(actualPrice) - Number(displayPrice)) / Number(actualPrice)) * 100)}% Off (Strikethrough line active)
+                      </p>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                          Star Rating (1.0 - 5.0)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="1"
+                          max="5"
+                          value={rating}
+                          onChange={(e) => setRating(e.target.value)}
+                          placeholder="5.0"
+                          className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#C5A880]"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                          Badge Tag (Top Left)
+                        </label>
+                        <input
+                          type="text"
+                          value={badgeText}
+                          onChange={(e) => setBadgeText(e.target.value)}
+                          placeholder="e.g. Trending, Latest, Hot"
+                          className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#C5A880]"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <button
@@ -262,12 +378,12 @@ export const AdminDashboardPage: React.FC = () => {
                 {isUploading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Uploading to Supabase Storage...</span>
+                    <span>Uploading Image...</span>
                   </>
                 ) : (
                   <>
                     <Upload className="w-4 h-4" />
-                    <span>Upload &amp; Generate Public URL</span>
+                    <span>Upload Image</span>
                   </>
                 )}
               </button>
@@ -275,19 +391,19 @@ export const AdminDashboardPage: React.FC = () => {
           </form>
         </div>
 
-        {/* Uploaded Media Table & Public URL Gallery */}
+        {/* Uploaded Media Table */}
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="font-serif-luxury text-2xl font-bold">Uploaded Storage Images ({filteredImages.length})</h2>
+              <h2 className="font-serif-luxury text-2xl font-bold">Uploaded Media Images ({filteredImages.length})</h2>
               <p className="text-xs text-stone-500">
-                Click "Copy Public URL" to use anywhere or test directly in your browser.
+                Manage your uploaded media images for featured collections and trending section.
               </p>
             </div>
 
             {/* Category Filter Pills */}
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-              {['all', 'hero', 'banner', 'collection', 'gallery'].map((sec) => (
+              {['all', 'collection', 'trending'].map((sec) => (
                 <button
                   key={sec}
                   onClick={() => setFilterSection(sec)}
@@ -310,7 +426,7 @@ export const AdminDashboardPage: React.FC = () => {
                 No uploaded images found for section "{filterSection}"
               </p>
               <p className="text-xs text-stone-400 max-w-sm mx-auto">
-                Use the upload form above to add image assets directly into your Supabase Storage bucket.
+                Use the upload form above to add image assets.
               </p>
             </div>
           ) : (
@@ -339,55 +455,21 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
 
                     {/* Content Details */}
-                    <div className="p-4 space-y-2">
-                      <h3 className="font-semibold text-sm line-clamp-1">{img.title}</h3>
-                      <div className="bg-stone-50 dark:bg-neutral-800/70 p-2 rounded-lg border border-stone-200/80 dark:border-neutral-700">
-                        <span className="text-[10px] font-bold uppercase text-stone-400 block mb-0.5">
-                          Public Storage URL:
-                        </span>
-                        <p className="text-[11px] font-mono text-stone-600 dark:text-stone-300 truncate">
-                          {img.url}
-                        </p>
+                    <div className="p-4 flex items-center justify-between gap-3 border-t border-stone-100 dark:border-neutral-800">
+                      <div className="space-y-0.5 truncate">
+                        <h3 className="font-semibold text-sm truncate">{img.title}</h3>
+                        <span className="text-[10px] uppercase text-stone-400 font-medium">{img.targetSection}</span>
                       </div>
+
+                      <button
+                        onClick={() => handleDeleteImage(img)}
+                        className="px-3 py-2 bg-red-50 dark:bg-red-950/50 hover:bg-red-600 hover:text-white text-red-600 dark:text-red-400 rounded-xl transition-all text-xs font-semibold flex items-center gap-1.5 shrink-0 shadow-sm"
+                        title="Delete image"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Delete</span>
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Actions Bar */}
-                  <div className="p-4 pt-0 flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => handleCopyUrl(img.url, img.id)}
-                      className="flex-1 bg-stone-100 dark:bg-neutral-800 hover:bg-[#C5A880] hover:text-black text-stone-800 dark:text-stone-200 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-                    >
-                      {copiedId === img.id ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Copy Public URL</span>
-                        </>
-                      )}
-                    </button>
-
-                    <a
-                      href={img.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 bg-stone-100 dark:bg-neutral-800 hover:bg-stone-200 rounded-xl text-stone-700 dark:text-stone-300 transition-colors"
-                      title="Open image in new tab"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-
-                    <button
-                      onClick={() => handleDeleteImage(img)}
-                      className="p-2 bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 rounded-xl transition-colors"
-                      title="Delete image from storage"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
                 </motion.div>
               ))}

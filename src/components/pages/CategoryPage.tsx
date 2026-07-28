@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Sparkles, Star, Eye, ShoppingBag, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import { PRODUCTS, CATEGORIES_LIST } from '../../data/mockData';
+import { Product } from '../../types';
+import { fetchAdminImages, mapAdminImagesToProducts } from '../../lib/supabase';
 
 export const CategoryPage: React.FC = () => {
   const { 
@@ -15,6 +17,20 @@ export const CategoryPage: React.FC = () => {
     navigateTo 
   } = useShop();
 
+  const [uploadedProducts, setUploadedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function loadUploaded() {
+      try {
+        const adminImgs = await fetchAdminImages();
+        setUploadedProducts(mapAdminImagesToProducts(adminImgs, 'cat-up-prod'));
+      } catch (e) {
+        console.error('Error loading uploaded images for CategoryPage:', e);
+      }
+    }
+    loadUploaded();
+  }, []);
+
   const categoryMeta = CATEGORIES_LIST.find(c => c.name === selectedCategory) || {
     name: selectedCategory,
     image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=1600&q=85',
@@ -22,8 +38,16 @@ export const CategoryPage: React.FC = () => {
     itemCount: 'Catalog Collection'
   };
 
-  const categoryProducts = PRODUCTS.filter(p => {
+  const allProducts = [...uploadedProducts, ...PRODUCTS];
+
+  const categoryProducts = allProducts.filter(p => {
     if (selectedCategory === 'Luxury Collection') return p.isLuxury;
+    if (selectedCategory === 'Sarees') {
+      return p.category === 'Sarees' || p.subCategory === 'Saree' || p.subCategory === 'Sarees' || p.tags.some(t => t.toLowerCase().includes('saree'));
+    }
+    if (selectedCategory === 'Aariwork') {
+      return p.category === 'Aariwork' || p.subCategory === 'Aariwork' || p.tags.some(t => t.toLowerCase().includes('aari') || t.toLowerCase().includes('embroidered') || t.toLowerCase().includes('zardozi'));
+    }
     return p.category === selectedCategory || p.tags.includes(selectedCategory);
   });
 
@@ -105,6 +129,25 @@ export const CategoryPage: React.FC = () => {
                     onClick={() => navigateTo('product-detail', { product })}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
+
+                  {/* Badges */}
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 flex flex-col gap-1">
+                    {(product.tags && product.tags[2]) ? (
+                      <div className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-stone-900/90 text-white text-[8px] sm:text-[9px] font-bold uppercase tracking-widest border border-white/20 backdrop-blur-md shadow">
+                        {product.tags[2]}
+                      </div>
+                    ) : product.isLuxury ? (
+                      <div className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-stone-900/90 text-[#E5C158] text-[8px] sm:text-[9px] font-bold uppercase tracking-widest border border-[#C5A880]/40 backdrop-blur-md shadow">
+                        Haute Exclusive
+                      </div>
+                    ) : null}
+
+                    {product.discountPercentage && (
+                      <div className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md bg-[#C5A880] text-black text-[8px] sm:text-[9px] font-bold uppercase tracking-widest shadow">
+                        -{product.discountPercentage}% Off
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="p-3 sm:p-4 space-y-1 sm:space-y-1.5 flex-1 flex flex-col justify-between">

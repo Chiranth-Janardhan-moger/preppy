@@ -57,43 +57,16 @@ const HERO_IMAGES = [
 export const HeroSection: React.FC = () => {
   const { navigateTo } = useShop();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [allHeroSlides, setAllHeroSlides] = useState<{ img: string; alt: string; tag: string }[]>(HERO_IMAGES);
 
   useEffect(() => {
-    async function loadDynamicHeroImages() {
-      try {
-        const { fetchAdminImages } = await import('../../lib/supabase');
-        const dynamicImages = await fetchAdminImages();
-        const uploadedHeroes = dynamicImages
-          .filter(item => item.targetSection === 'hero' && Boolean(item.url))
-          .map(item => ({
-            img: item.url,
-            alt: item.title || 'PREPPY Couture',
-            tag: item.title || 'Maison PREPPY'
-          }));
-
-        if (uploadedHeroes.length > 0) {
-          setAllHeroSlides([...uploadedHeroes, ...HERO_IMAGES]);
-        }
-      } catch (err) {
-        console.warn('Failed loading dynamic hero images:', err);
-      }
-    }
-    loadDynamicHeroImages();
-  }, []);
-
-  const validHeroImages = allHeroSlides.filter(i => Boolean(i.img));
-
-  useEffect(() => {
-    if (validHeroImages.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % validHeroImages.length);
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % HERO_IMAGES.length);
     }, 7000);
 
     return () => clearInterval(timer);
-  }, [validHeroImages.length]);
+  }, []);
 
-  const activeSlide = validHeroImages[currentImageIndex] || validHeroImages[0] || { img: hero1, alt: 'PREPPY' };
+  const activeSlide = HERO_IMAGES[currentImageIndex];
 
   return (
     <section className="relative w-full h-screen min-h-[700px] overflow-hidden flex items-center justify-center bg-[#FAF8F5] dark:bg-[#0A0A0A] text-[#121212] dark:text-white">

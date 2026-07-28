@@ -8,7 +8,8 @@ import {
   Phone 
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
-import logo from '../assets/logo-preppy.png';
+import preppyLogo from '../assets/logo-preppy.png';
+import pallaviLogo from '../assets/pallavi-logo.jpeg';
 
 export const Footer: React.FC = () => {
   const { navigateTo, isAdminLoggedIn } = useShop();
@@ -27,13 +28,15 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pt-6">
           {/* Brand Info */}
           <div className="lg:col-span-2 space-y-5">
-            <div className="cursor-pointer flex items-center gap-2" onClick={() => navigateTo('home')}>
-              <img src={logo} alt="PREPPY" className="h-10 md:h-12 w-auto object-contain bg-white/95 p-1 rounded-lg shadow-sm" />
-              <span className="text-sm font-semibold tracking-wider">Pallavi designer Studio</span>
+            <div className="cursor-pointer flex items-center flex-wrap gap-2.5" onClick={() => navigateTo('home')}>
+              <img src={preppyLogo} alt="PREPPY" className="h-10 md:h-12 w-auto object-contain bg-white/95 p-1 rounded-lg shadow-sm" />
+              <span className="text-base font-serif-luxury font-semibold tracking-wider text-white uppercase">preppy</span>
+              <img src={pallaviLogo} alt="Pallavi Designer Studio" className="h-10 md:h-12 w-auto object-contain rounded-lg shadow-sm border border-white/20" />
+              <span className="text-sm font-semibold tracking-wider text-[#C5A880]">Pallavi designer Studio</span>
             </div>
 
             <p className="text-xs text-gray-400 leading-relaxed max-w-sm">
-              Established in Paris and redefined globally. Crafting heirloom fashion, bespoke hand-draped silk gowns, and imperial tailoring designed to transcend generations.
+              Established in Bengaluru and redefined globally. Crafting heirloom fashion, bespoke hand-draped silk sarees, Aari needlework, and imperial tailoring designed to transcend generations.
             </p>
 
             <div className="flex gap-4 pt-2">
@@ -118,10 +121,13 @@ export const Footer: React.FC = () => {
           <p>© 2026 PREPPY Haute Couture Maison. All Rights Reserved.</p>
 
           <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-gray-300">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-300">Terms of Haute Service</a>
-            <button onClick={() => navigateTo(isAdminLoggedIn ? 'admin' : 'admin-login')} className="hover:text-[#C5A880] text-gray-400 font-semibold">
-              Admin Portal
+            <a href="#" className="hover:text-gray-300 transition-colors">Shipping &amp; Return Policy</a>
+            <a href="#" className="hover:text-gray-300 transition-colors">Terms of Haute Service</a>
+            <button 
+              onClick={() => navigateTo(isAdminLoggedIn ? 'admin' : 'admin-login')} 
+              className="hover:text-gray-300 transition-colors"
+            >
+              Privacy Policy
             </button>
           </div>
 

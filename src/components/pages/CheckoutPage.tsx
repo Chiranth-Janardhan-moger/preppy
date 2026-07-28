@@ -35,41 +35,21 @@ export const CheckoutPage: React.FC = () => {
 
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
-  // Generate WhatsApp message text following exact requested format
-  const generateMessageText = () => {
-    const itemsList = cart.map((item, index) => {
-      return `${index + 1}. ${item.product.name} × ${item.quantity}`;
-    }).join('\n');
-
-    return `Hello,\n\nI would like to place an order.\n\nItems:\n${itemsList}\n\nTotal: ${formatPrice(subtotal)}\n\nName: ${customerName}\nPhone: ${customerPhone}\nAddress: ${customerAddress}\n\nThank you!`;
-  };
-
   const handleSendToWhatsApp = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!customerName.trim()) {
-      showToast('Please enter your Name before proceeding', 'error');
-      return;
-    }
-    if (!customerPhone.trim()) {
-      showToast('Please enter your Phone number before proceeding', 'error');
-      return;
-    }
-    if (!customerAddress.trim()) {
-      showToast('Please enter your Delivery Address before proceeding', 'error');
+    if (!customerName.trim() || !customerPhone.trim() || !customerAddress.trim()) {
+      showToast('Please complete all delivery details before proceeding', 'error');
       return;
     }
 
-    const rawMessage = generateMessageText();
-    const encodedMessage = encodeURIComponent(rawMessage);
-    const whatsappPhone = '919876543210'; // Global Concierge WhatsApp
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappPhone}&text=${encodedMessage}`;
+    const productsList = cart.map(item => `• ${item.product.name} × ${item.quantity}`).join('\n');
+    const message = `🛍️ New Order\n\nName: ${customerName.trim()}\nPhone: ${customerPhone.trim()}\n\nProducts:\n${productsList}\n\nTotal: ${formatPrice(subtotal)}\n\nAddress:\n${customerAddress.trim()}`;
 
-    setOrderPlaced(true);
-    showToast('Opening WhatsApp with your order details...', 'success');
-
-    // Open WhatsApp in new tab / app
-    window.open(whatsappUrl, '_blank');
+    window.open(`https://wa.me/919876543210?text=${encodeURIComponent(message)}`, '_blank');
+    clearCart();
+    showToast('Redirecting to WhatsApp to complete order...', 'success');
+    navigateTo('home');
   };
 
   if (cart.length === 0 && !orderPlaced) {

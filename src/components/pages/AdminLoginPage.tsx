@@ -19,7 +19,7 @@ export const AdminLoginPage: React.FC = () => {
     if (success) {
       navigateTo('admin');
     } else {
-      setErrorMsg('Invalid passcode. Default passcode is: preppy2026');
+      setErrorMsg('Invalid security passcode. Please try again.');
     }
   };
 
@@ -42,9 +42,6 @@ export const AdminLoginPage: React.FC = () => {
           <h1 className="font-serif-luxury text-3xl font-medium tracking-tight">
             Admin Portal Access
           </h1>
-          <p className="text-xs text-gray-500 dark:text-gray-400 font-sans max-w-xs mx-auto">
-            Manage homepage banners, upload high-resolution collection images, and generate public Supabase URLs.
-          </p>
         </div>
 
         {/* Login Form */}
@@ -61,7 +58,7 @@ export const AdminLoginPage: React.FC = () => {
                   setPasscode(e.target.value);
                   setErrorMsg('');
                 }}
-                placeholder="Enter passcode (e.g. preppy2026)"
+                placeholder="Enter security passcode"
                 className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-3.5 pl-11 text-sm font-mono focus:outline-none focus:border-[#C5A880] transition-colors"
                 autoFocus
               />
@@ -82,16 +79,6 @@ export const AdminLoginPage: React.FC = () => {
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
-
-        {/* Helpful Passcode hint */}
-        <div className="bg-stone-50 dark:bg-neutral-800/50 rounded-2xl p-4 border border-stone-200/80 dark:border-neutral-700/60 text-xs space-y-1">
-          <div className="flex items-center gap-1.5 font-semibold text-[#C5A880]">
-            <Sparkles className="w-3.5 h-3.5" /> Quick Access Passcode:
-          </div>
-          <p className="text-stone-600 dark:text-stone-300 font-mono text-[11px]">
-            Passcode: <code className="font-bold text-stone-900 dark:text-white">preppy2026</code>
-          </p>
-        </div>
       </motion.div>
     </div>
   );

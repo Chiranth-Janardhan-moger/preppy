@@ -1,9 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
+import { fetchAdminImages } from '../../lib/supabase';
+import trendingFallback from '../../assets/trending.jpg';
 
 export const SeasonalCollection: React.FC = () => {
   const { navigateTo } = useShop();
+  const [trendingImg, setTrendingImg] = useState<string>(trendingFallback);
+
+  useEffect(() => {
+    async function loadTrending() {
+      try {
+        const images = await fetchAdminImages();
+        const uploadedTrending = images.find(
+          img => img.targetSection === 'trending' || img.filePath.toLowerCase().includes('trending') || img.url.toLowerCase().includes('trending')
+        );
+        if (uploadedTrending && uploadedTrending.url) {
+          setTrendingImg(uploadedTrending.url);
+        }
+      } catch (e) {
+        console.error('Error loading trending image:', e);
+      }
+    }
+    loadTrending();
+  }, []);
 
   return (
     <section className="py-20 px-6 md:px-12 max-w-7xl mx-auto">
@@ -11,8 +31,8 @@ export const SeasonalCollection: React.FC = () => {
         {/* Left Visual */}
         <div className="relative min-h-[400px] lg:min-h-[550px] overflow-hidden group">
           <img
-            src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1200&q=85"
-            alt="Autumn Winter Haute Collection"
+            src={trendingImg}
+            alt="Trending Haute Collection"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000"
           />
@@ -30,23 +50,12 @@ export const SeasonalCollection: React.FC = () => {
           </h2>
 
           <p className="text-xs md:text-sm text-stone-300 font-sans leading-relaxed">
-            Explore our exclusive collection crafted with deep jewel tones, hand embroidery, and soft Mulberry silk silhouettes.
+            Discover our newest trending creations, featuring exquisite handloom silk sarees, bespoke Aari needlework, and luxury handcrafted accessories. Each piece is individually tailored with intricate craftsmanship, rich color palettes, and royal detailing designed to make every occasion unforgettable.
           </p>
-
-          <div className="grid grid-cols-2 gap-4 py-4 border-y border-white/10 text-xs">
-            <div>
-              <strong className="block text-white font-semibold text-sm">320+ Hours</strong>
-              <span className="text-gray-400">Handcrafting per ensemble</span>
-            </div>
-            <div>
-              <strong className="block text-white font-semibold text-sm">100% Pure Silk</strong>
-              <span className="text-gray-400">Mulberry &amp; Italian Velvet</span>
-            </div>
-          </div>
 
           <div>
             <button
-              onClick={() => navigateTo('category', { category: 'Luxury Collection' })}
+              onClick={() => navigateTo('shop')}
               className="bg-[#C5A880] hover:bg-[#A88B60] text-black font-semibold text-xs uppercase tracking-widest px-8 py-4 rounded-lg transition-all duration-300 shadow-xl inline-flex items-center gap-2 group"
             >
               Shop The Capsule Line

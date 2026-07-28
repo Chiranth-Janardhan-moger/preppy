@@ -1,5 +1,7 @@
 export type CategoryType = 
   | 'All'
+  | 'Sarees'
+  | 'Aariwork'
   | 'Women' 
   | 'Men' 
   | 'Ethnic' 
@@ -111,7 +113,13 @@ export interface AdminImage {
   title: string;
   bucket: string;
   filePath: string;
-  targetSection: 'hero' | 'banner' | 'gallery' | 'collection';
+  targetSection: 'collection' | 'trending' | 'hero' | 'banner' | 'gallery';
+  targetCategory?: 'Sarees' | 'Aariwork' | 'Accessories';
+  displayPrice?: number;
+  actualPrice?: number;
+  rating?: number;
+  badgeText?: string;
+  subtitle?: string;
   createdAt: string;
 }
 
