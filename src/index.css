@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.never-dark-mode));
+
+@layer base {
+  :root {
+    --font-serif: 'Bodoni Moda', 'Cormorant Garamond', Georgia, serif;
+    --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  html, body {
+    color-scheme: light !important;
+    background-color: #FAF8F5 !important;
+    color: #121212 !important;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 639px) {
+  html {
+    font-size: 90%;
+  }
+  section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+}
+
+.font-serif-luxury {
+  font-family: var(--font-serif);
+}
+
+.font-cormorant {
+  font-family: var(--font-cormorant);
+}
+
+/* Custom Scrollbar for Luxury Aesthetic - Hidden by default */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Glassmorphism */
+.glass-luxury {
+  background: rgba(250, 248, 245, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(197,168,128,0.15) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

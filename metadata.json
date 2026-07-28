@@ -1,0 +1,8 @@
+{
+  "name": "Remix: ASTRYX — Luxury Boutique \u0026 Haute Couture",
+  "description": "An exquisite luxury fashion boutique featuring editorial collections, bespoke haute couture, interactive product lookbooks, multi-currency shopping experience, and modern luxury design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
