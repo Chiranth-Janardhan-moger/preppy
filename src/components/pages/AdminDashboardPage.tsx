@@ -40,6 +40,9 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Supabase Credentials Settings Modal State
   const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [devPasswordVerified, setDevPasswordVerified] = useState(false);
+  const [devPassword, setDevPassword] = useState('');
+  const [devPasswordError, setDevPasswordError] = useState(false);
   const initialCreds = getSupabaseCredentials();
   const [supabaseUrl, setSupabaseUrl] = useState(initialCreds.url);
   const [supabaseAnonKey, setSupabaseAnonKey] = useState(initialCreds.anonKey);
@@ -119,12 +122,32 @@ export const AdminDashboardPage: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleDevPasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (devPassword === 'preppy@dev2026') {
+      setDevPasswordVerified(true);
+      setDevPasswordError(false);
+    } else {
+      setDevPasswordError(true);
+      showToast('Invalid developer password', 'error');
+    }
+  };
+
   const handleSaveConfig = (e: React.FormEvent) => {
     e.preventDefault();
     saveSupabaseCredentials(supabaseUrl, supabaseAnonKey);
     setIsConfigOpen(false);
+    setDevPasswordVerified(false);
+    setDevPassword('');
     showToast('Supabase API credentials saved successfully!', 'success');
     loadImages();
+  };
+
+  const handleCloseConfig = () => {
+    setIsConfigOpen(false);
+    setDevPasswordVerified(false);
+    setDevPassword('');
+    setDevPasswordError(false);
   };
 
   const filteredImages = (adminImages || []).filter(img => {
@@ -435,66 +458,114 @@ export const AdminDashboardPage: React.FC = () => {
               <div className="flex items-center justify-between border-b border-stone-200 dark:border-neutral-800 pb-4">
                 <div className="flex items-center gap-3">
                   <Database className="w-6 h-6 text-[#C5A880]" />
-                  <h3 className="font-serif-luxury text-xl font-bold">Supabase API Configuration</h3>
+                  <h3 className="font-serif-luxury text-xl font-bold">
+                    {devPasswordVerified ? 'Supabase API Configuration' : 'Developer Verification'}
+                  </h3>
                 </div>
                 <button
-                  onClick={() => setIsConfigOpen(false)}
+                  onClick={handleCloseConfig}
                   className="text-stone-400 hover:text-stone-700 font-bold"
                 >
                   ✕
                 </button>
               </div>
 
-              <form onSubmit={handleSaveConfig} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
-                    Supabase Project URL
-                  </label>
-                  <input
-                    type="url"
-                    value={supabaseUrl}
-                    onChange={(e) => setSupabaseUrl(e.target.value)}
-                    placeholder="https://your-project.supabase.co"
-                    className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-[#C5A880]"
-                  />
-                </div>
+              {!devPasswordVerified ? (
+                <form onSubmit={handleDevPasswordSubmit} className="space-y-4">
+                  <div className="bg-amber-50 dark:bg-amber-950/30 p-4 rounded-xl border border-amber-200 dark:border-amber-900/50 text-xs space-y-1">
+                    <p className="font-bold text-amber-700 dark:text-amber-400">Restricted Access</p>
+                    <p className="text-amber-600 dark:text-amber-500 text-[11px] leading-relaxed">
+                      Supabase credentials can only be modified by authorized developers. Enter the developer password to continue.
+                    </p>
+                  </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
-                    Supabase Anon Public API Key
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={supabaseAnonKey}
-                    onChange={(e) => setSupabaseAnonKey(e.target.value)}
-                    placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                    className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-[#C5A880]"
-                  />
-                </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                      Developer Password
+                    </label>
+                    <input
+                      type="password"
+                      value={devPassword}
+                      onChange={(e) => { setDevPassword(e.target.value); setDevPasswordError(false); }}
+                      placeholder="Enter developer password"
+                      autoFocus
+                      className={`w-full bg-stone-50 dark:bg-neutral-800 border rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-[#C5A880] ${
+                        devPasswordError ? 'border-red-400 dark:border-red-600' : 'border-stone-200 dark:border-neutral-700'
+                      }`}
+                    />
+                    {devPasswordError && (
+                      <p className="text-[11px] text-red-500 font-semibold">Incorrect developer password. Access denied.</p>
+                    )}
+                  </div>
 
-                <div className="bg-stone-50 dark:bg-neutral-800/50 p-4 rounded-xl border border-stone-200 text-xs space-y-1">
-                  <p className="font-bold text-[#C5A880]">Bucket Setup Instructions:</p>
-                  <p className="text-stone-500 leading-relaxed text-[11px]">
-                    Create a bucket named <code className="font-bold text-stone-900 dark:text-white">home</code> in Supabase Dashboard → Storage, and enable Public access.
-                  </p>
-                </div>
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleCloseConfig}
+                      className="px-4 py-2.5 rounded-xl text-xs font-semibold border border-stone-300 dark:border-neutral-700 hover:bg-stone-100"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 rounded-xl text-xs font-semibold bg-[#121212] dark:bg-white text-white dark:text-black hover:bg-[#C5A880]"
+                    >
+                      Verify &amp; Continue
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form onSubmit={handleSaveConfig} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                      Supabase Project URL
+                    </label>
+                    <input
+                      type="url"
+                      value={supabaseUrl}
+                      onChange={(e) => setSupabaseUrl(e.target.value)}
+                      placeholder="https://your-project.supabase.co"
+                      className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-[#C5A880]"
+                    />
+                  </div>
 
-                <div className="flex justify-end gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsConfigOpen(false)}
-                    className="px-4 py-2.5 rounded-xl text-xs font-semibold border border-stone-300 dark:border-neutral-700 hover:bg-stone-100"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 rounded-xl text-xs font-semibold bg-[#121212] dark:bg-white text-white dark:text-black hover:bg-[#C5A880]"
-                  >
-                    Save Credentials
-                  </button>
-                </div>
-              </form>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 block">
+                      Supabase Anon Public API Key
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={supabaseAnonKey}
+                      onChange={(e) => setSupabaseAnonKey(e.target.value)}
+                      placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      className="w-full bg-stone-50 dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 rounded-xl px-4 py-3 text-xs font-mono focus:outline-none focus:border-[#C5A880]"
+                    />
+                  </div>
+
+                  <div className="bg-stone-50 dark:bg-neutral-800/50 p-4 rounded-xl border border-stone-200 text-xs space-y-1">
+                    <p className="font-bold text-[#C5A880]">Bucket Setup Instructions:</p>
+                    <p className="text-stone-500 leading-relaxed text-[11px]">
+                      Create a bucket named <code className="font-bold text-stone-900 dark:text-white">home</code> in Supabase Dashboard &rarr; Storage, and enable Public access.
+                    </p>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleCloseConfig}
+                      className="px-4 py-2.5 rounded-xl text-xs font-semibold border border-stone-300 dark:border-neutral-700 hover:bg-stone-100"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 rounded-xl text-xs font-semibold bg-[#121212] dark:bg-white text-white dark:text-black hover:bg-[#C5A880]"
+                    >
+                      Save Credentials
+                    </button>
+                  </div>
+                </form>
+              )}
             </motion.div>
           </div>
         )}
