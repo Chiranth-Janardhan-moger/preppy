@@ -35,20 +35,27 @@ const HERO_IMAGES = [
 ];
 
 export const HeroSection: React.FC = () => {
-  const { navigateTo } = useShop();
+  const { navigateTo, adminImages } = useShop();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const validHeroImages = HERO_IMAGES.filter(i => Boolean(i.img));
+  // Merge dynamic Supabase admin images with local static hero images
+  const dynamicHeroImages = (adminImages || [])
+    .filter(i => i.targetSection === 'hero' || i.targetSection === 'banner')
+    .map(i => ({ img: i.url, alt: i.title, tag: 'Supabase Storage Live Media' }));
+
+  const validStaticImages = HERO_IMAGES.filter(i => Boolean(i.img));
+  const activeHeroSlides = [...dynamicHeroImages, ...validStaticImages];
 
   useEffect(() => {
+    if (activeHeroSlides.length === 0) return;
     const timer = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % validHeroImages.length);
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % activeHeroSlides.length);
     }, 7000);
 
     return () => clearInterval(timer);
-  }, [validHeroImages.length]);
+  }, [activeHeroSlides.length]);
 
-  const activeSlide = validHeroImages[currentImageIndex] || validHeroImages[0] || { img: hero1, alt: 'PREPPY' };
+  const activeSlide = activeHeroSlides[currentImageIndex] || activeHeroSlides[0] || validStaticImages[0] || { img: hero1, alt: 'PREPPY' };
 
   return (
     <section className="relative w-full h-screen min-h-[700px] overflow-hidden flex items-center justify-center bg-[#FAF8F5] dark:bg-[#0A0A0A] text-[#121212] dark:text-white">
@@ -112,7 +119,7 @@ export const HeroSection: React.FC = () => {
 
       {/* Slide Navigation Dots */}
       <div className="absolute bottom-8 right-8 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-        {validHeroImages.map((_, idx) => (
+        {activeHeroSlides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentImageIndex(idx)}

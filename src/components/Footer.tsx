@@ -11,7 +11,7 @@ import { useShop } from '../context/ShopContext';
 import logo from '../assets/logo-preppy.png';
 
 export const Footer: React.FC = () => {
-  const { navigateTo } = useShop();
+  const { navigateTo, isAdminLoggedIn } = useShop();
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -120,7 +120,9 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-6">
             <a href="#" className="hover:text-gray-300">Privacy Policy</a>
             <a href="#" className="hover:text-gray-300">Terms of Haute Service</a>
-            <a href="#" className="hover:text-gray-300">Authenticity Guarantee</a>
+            <button onClick={() => navigateTo(isAdminLoggedIn ? 'admin' : 'admin-login')} className="hover:text-[#C5A880] text-gray-400 font-semibold">
+              Admin Portal
+            </button>
           </div>
 
           <button

@@ -25,9 +25,11 @@ import { UserAccountPage } from './components/pages/UserAccountPage';
 import { AboutPage } from './components/pages/AboutPage';
 import { FAQPage } from './components/pages/FAQPage';
 import { ContactPage } from './components/pages/ContactPage';
+import { AdminLoginPage } from './components/pages/AdminLoginPage';
+import { AdminDashboardPage } from './components/pages/AdminDashboardPage';
 
 const AppContent: React.FC = () => {
-  const { pageView } = useShop();
+  const { pageView, isAdminLoggedIn } = useShop();
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#121212] font-sans selection:bg-[#C5A880] selection:text-white flex flex-col justify-between">
@@ -36,7 +38,7 @@ const AppContent: React.FC = () => {
 
       {/* Main Content View Switcher */}
       <main className="flex-1">
-        {(pageView === 'home' || !['shop', 'category', 'checkout', 'wishlist', 'account', 'about', 'faq', 'contact'].includes(pageView)) && (
+        {(pageView === 'home' || !['shop', 'category', 'checkout', 'wishlist', 'account', 'about', 'faq', 'contact', 'admin-login', 'admin'].includes(pageView)) && (
           <>
             <HeroSection />
             <FeaturedCollections />
@@ -59,6 +61,8 @@ const AppContent: React.FC = () => {
         {pageView === 'about' && <AboutPage />}
         {pageView === 'faq' && <FAQPage />}
         {pageView === 'contact' && <ContactPage />}
+        {pageView === 'admin-login' && <AdminLoginPage />}
+        {pageView === 'admin' && (isAdminLoggedIn ? <AdminDashboardPage /> : <AdminLoginPage />)}
       </main>
 
       {/* Global Drawers & Modals */}

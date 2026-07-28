@@ -105,6 +105,16 @@ export interface UserProfile {
   orders: Order[];
 }
 
+export interface AdminImage {
+  id: string;
+  url: string;
+  title: string;
+  bucket: string;
+  filePath: string;
+  targetSection: 'hero' | 'banner' | 'gallery' | 'collection';
+  createdAt: string;
+}
+
 export type PageView = 
   | 'home' 
   | 'shop' 
@@ -116,4 +126,6 @@ export type PageView =
   | 'account' 
   | 'about' 
   | 'faq' 
-  | 'contact';
+  | 'contact'
+  | 'admin'
+  | 'admin-login';
