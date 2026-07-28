@@ -34,6 +34,7 @@ export const SeasonalCollection: React.FC = () => {
             src={trendingImg}
             alt="Trending Haute Collection"
             referrerPolicy="no-referrer"
+            onError={() => setTrendingImg(trendingFallback)}
             className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-1000"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent lg:to-stone-900/80" />

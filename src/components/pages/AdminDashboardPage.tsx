@@ -6,7 +6,8 @@ import {
   Image as ImageIcon, 
   LogOut, 
   RefreshCw,
-  ArrowLeft
+  ArrowLeft,
+  Trash
 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import { AdminImage } from '../../types';
@@ -16,7 +17,8 @@ import {
   deleteImageFromStorage,
   getSupabaseCredentials,
   saveSupabaseCredentials,
-  getSupabaseClient
+  getSupabaseClient,
+  clearAllAdminImages
 } from '../../lib/supabase';
 
 export const AdminDashboardPage: React.FC = () => {
@@ -46,6 +48,15 @@ export const AdminDashboardPage: React.FC = () => {
     } catch (e) {
       console.error('Failed to load admin images:', e);
       setAdminImages([]);
+    }
+  };
+
+  const handleClearStaleData = async () => {
+    if (window.confirm('Are you sure you want to clear all stale media cache? This will clean up deleted files and restore default site imagery.')) {
+      await clearAllAdminImages();
+      setAdminImages([]);
+      showToast('Stale media metadata cleared successfully.', 'info');
+      await loadImages();
     }
   };
 
@@ -160,6 +171,15 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => handleClearStaleData()}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-stone-100 dark:bg-neutral-800 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-900/60 hover:bg-amber-50 transition-colors shadow-sm"
+              title="Clear deleted/stale image records"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Reset Media Cache</span>
+            </button>
+
             <button
               onClick={() => loadImages()}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white dark:bg-neutral-800 border border-stone-200 dark:border-neutral-700 hover:border-[#C5A880] transition-colors shadow-sm"

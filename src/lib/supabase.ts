@@ -369,3 +369,15 @@ async function syncToLocalCache(newItem: AdminImage) {
     console.error('Sync to local cache error:', e);
   }
 }
+
+export async function clearAllAdminImages(): Promise<void> {
+  localStorage.removeItem(LOCAL_IMAGES_STORAGE_KEY);
+  const supabase = getSupabaseClient();
+  if (supabase) {
+    try {
+      await supabase.storage.from('home').remove(['catalog_metadata.json']);
+    } catch (e) {
+      console.warn('Error clearing catalog_metadata.json:', e);
+    }
+  }
+}
