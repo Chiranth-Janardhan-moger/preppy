@@ -43,6 +43,10 @@ export const AdminDashboardPage: React.FC = () => {
   const [supabaseUrl, setSupabaseUrl] = useState(initialCreds.url);
   const [supabaseAnonKey, setSupabaseAnonKey] = useState(initialCreds.anonKey);
 
+  React.useEffect(() => {
+    loadAdminImages();
+  }, []);
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];

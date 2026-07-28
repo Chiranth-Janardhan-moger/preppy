@@ -47,6 +47,10 @@ export const HeroSection: React.FC = () => {
   const activeHeroSlides = [...dynamicHeroImages, ...validStaticImages];
 
   useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [activeHeroSlides.length]);
+
+  useEffect(() => {
     if (activeHeroSlides.length === 0) return;
     const timer = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % activeHeroSlides.length);

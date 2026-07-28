@@ -195,10 +195,6 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  useEffect(() => {
-    loadAdminImages();
-  }, []);
-
   const adminLogin = (passcode: string): boolean => {
     if (passcode === 'preppy2026' || passcode === 'admin123' || passcode === 'admin') {
       setIsAdminLoggedIn(true);

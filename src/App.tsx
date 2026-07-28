@@ -16,6 +16,8 @@ import { WhyChooseUsSection } from './components/home/WhyChooseUsSection';
 import { ReviewsSection } from './components/home/ReviewsSection';
 import { InstagramGallery } from './components/home/InstagramGallery';
 
+import { ErrorBoundary } from './components/ErrorBoundary';
+
 // Pages
 import { ShopPage } from './components/pages/ShopPage';
 import { CategoryPage } from './components/pages/CategoryPage';
@@ -25,8 +27,14 @@ import { UserAccountPage } from './components/pages/UserAccountPage';
 import { AboutPage } from './components/pages/AboutPage';
 import { FAQPage } from './components/pages/FAQPage';
 import { ContactPage } from './components/pages/ContactPage';
-import { AdminLoginPage } from './components/pages/AdminLoginPage';
-import { AdminDashboardPage } from './components/pages/AdminDashboardPage';
+
+// Lazy-loaded Admin Module
+const AdminLoginPage = React.lazy(() =>
+  import('./components/pages/AdminLoginPage').then(m => ({ default: m.AdminLoginPage }))
+);
+const AdminDashboardPage = React.lazy(() =>
+  import('./components/pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage }))
+);
 
 const AppContent: React.FC = () => {
   const { pageView, isAdminLoggedIn } = useShop();
@@ -61,8 +69,11 @@ const AppContent: React.FC = () => {
         {pageView === 'about' && <AboutPage />}
         {pageView === 'faq' && <FAQPage />}
         {pageView === 'contact' && <ContactPage />}
-        {pageView === 'admin-login' && <AdminLoginPage />}
-        {pageView === 'admin' && (isAdminLoggedIn ? <AdminDashboardPage /> : <AdminLoginPage />)}
+        
+        <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-xs font-semibold uppercase tracking-widest text-[#C5A880]">Loading Admin Portal...</div>}>
+          {pageView === 'admin-login' && <AdminLoginPage />}
+          {pageView === 'admin' && (isAdminLoggedIn ? <AdminDashboardPage /> : <AdminLoginPage />)}
+        </React.Suspense>
       </main>
 
       {/* Global Drawers & Modals */}
@@ -78,8 +89,10 @@ const AppContent: React.FC = () => {
 
 export default function App() {
   return (
-    <ShopProvider>
-      <AppContent />
-    </ShopProvider>
+    <ErrorBoundary>
+      <ShopProvider>
+        <AppContent />
+      </ShopProvider>
+    </ErrorBoundary>
   );
 }
