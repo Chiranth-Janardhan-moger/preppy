@@ -11,8 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Supabase Auth Health Endpoint
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          curl -s -f -X GET "${{ secrets.SUPABASE_URL || 'https://ijmqfippsuzwqwvtcuxm.supabase.co' }}/auth/v1/health" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqbXFmaXBwc3V6d3F3dnRjdXhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMjQ3MDQsImV4cCI6MjEwMDgwMDcwNH0.w9ULs-9nLxoXziIK5xZJfMtsug__TF5uXbzxLVseYhs' }}" \
+          URL="${SUPABASE_URL:-https://ijmqfippsuzwqwvtcuxm.supabase.co}"
+          curl -s -f -X GET "${URL}/auth/v1/health" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
             > /dev/null
           echo "Supabase keep-alive ping successful!"
