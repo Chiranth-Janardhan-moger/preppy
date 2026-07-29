@@ -14,7 +14,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
-import { Calendar } from '@astryxdesign/core';
+import { CalendarPicker } from '../CalendarPicker';
 
 export const ContactPage: React.FC = () => {
   const { showToast, user } = useShop();
@@ -190,8 +190,8 @@ export const ContactPage: React.FC = () => {
                           transition={{ duration: 0.2 }}
                           className="absolute z-40 top-full right-0 left-0 sm:left-auto sm:w-[320px] mt-2 shadow-2xl rounded-2xl"
                         >
-                          <Calendar
-                            value={form.preferredDate as any}
+                          <CalendarPicker
+                            value={form.preferredDate}
                             onChange={(dateStr) => {
                               setForm({ ...form, preferredDate: dateStr });
                               setIsCalendarOpen(false);

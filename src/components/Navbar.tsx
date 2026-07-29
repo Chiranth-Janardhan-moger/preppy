@@ -99,7 +99,7 @@ export const Navbar: React.FC = () => {
                   exit={{ opacity: 0, y: 10 }}
                   className="absolute top-full left-1/2 -translate-x-1/2 w-[640px] bg-[#FAF8F5] text-[#121212] p-6 rounded-b-xl shadow-2xl border border-[#C5A880]/30 grid grid-cols-3 gap-4 z-50 mt-1"
                 >
-                  {CATEGORIES_LIST.slice(0, 6).map(cat => (
+                  {CATEGORIES_LIST.filter(cat => ['Sarees', 'Aariwork', 'Accessories'].includes(cat.name)).map(cat => (
                     <div
                       key={cat.name}
                       onClick={() => handleCategoryClick(cat.name as CategoryType)}
@@ -116,9 +116,6 @@ export const Navbar: React.FC = () => {
                       <h4 className="font-serif-luxury text-sm font-semibold group-hover:text-[#8C6D3B] transition-colors">
                         {cat.name}
                       </h4>
-                      <span className="text-[10px] text-stone-500 font-normal">
-                        {cat.itemCount}
-                      </span>
                     </div>
                   ))}
                 </motion.div>

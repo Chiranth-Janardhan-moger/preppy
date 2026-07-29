@@ -134,14 +134,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem('astryx_cart');
-      return saved ? JSON.parse(saved) : [
-        {
-          product: PRODUCTS[0],
-          selectedColor: PRODUCTS[0].colors[0],
-          selectedSize: 'S',
-          quantity: 1
-        }
-      ];
+      return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
@@ -150,10 +143,7 @@ export const ShopProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [wishlist, setWishlist] = useState<WishlistItem[]>(() => {
     try {
       const saved = localStorage.getItem('astryx_wishlist');
-      return saved ? JSON.parse(saved) : [
-        { product: PRODUCTS[2], addedAt: new Date().toISOString() },
-        { product: PRODUCTS[3], addedAt: new Date().toISOString() }
-      ];
+      return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }

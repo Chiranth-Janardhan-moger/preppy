@@ -9,7 +9,7 @@ export default defineConfig(() => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
-        '@astryxdesign/core/Calendar': path.resolve(__dirname, 'src/components/Calendar.tsx'),
+        '@astryxdesign/core/Calendar': path.resolve(__dirname, 'src/components/CalendarPicker.tsx'),
       },
     },
     server: {
