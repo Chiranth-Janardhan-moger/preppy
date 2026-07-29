@@ -10,10 +10,9 @@ jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST Endpoint
+      - name: Ping Supabase Auth Health Endpoint
         run: |
-          curl -s -f -X GET "${{ secrets.SUPABASE_URL || 'https://ijmqfippsuzwqwvtcuxm.supabase.co' }}/rest/v1/" \
+          curl -s -f -X GET "${{ secrets.SUPABASE_URL || 'https://ijmqfippsuzwqwvtcuxm.supabase.co' }}/auth/v1/health" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqbXFmaXBwc3V6d3F3dnRjdXhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMjQ3MDQsImV4cCI6MjEwMDgwMDcwNH0.w9ULs-9nLxoXziIK5xZJfMtsug__TF5uXbzxLVseYhs' }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqbXFmaXBwc3V6d3F3dnRjdXhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyMjQ3MDQsImV4cCI6MjEwMDgwMDcwNH0.w9ULs-9nLxoXziIK5xZJfMtsug__TF5uXbzxLVseYhs' }}" \
             > /dev/null
           echo "Supabase keep-alive ping successful!"
