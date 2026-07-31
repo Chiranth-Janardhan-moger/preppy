@@ -8,15 +8,32 @@ on:
 
 jobs:
   ping-supabase:
+    name: Keep Supabase Project Active
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase Auth Health Endpoint
+      - name: Ping Supabase Database Table
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          URL="${SUPABASE_URL:-https://ijmqfippsuzwqwvtcuxm.supabase.co}"
-          curl -s -f -X GET "${URL}/auth/v1/health" \
+          BASE_URL="${SUPABASE_URL:-https://ijmqfippsuzwqwvtcuxm.supabase.co}"
+          TARGET_ENDPOINT="${BASE_URL}/rest/v1/home_images?select=*&limit=1"
+
+          echo "Pinging Supabase PostgREST table endpoint: $TARGET_ENDPOINT"
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
-            > /dev/null
-          echo "Supabase keep-alive ping successful!"
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "$TARGET_ENDPOINT")
+
+          HTTP_BODY=$(echo "$RESPONSE" | sed -e '$d')
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1 | cut -d':' -f2)
+
+          echo "Response Body: $HTTP_BODY"
+          echo "HTTP Status Code: $HTTP_STATUS"
+
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "Supabase database ping successful!"
+          else
+            echo "Database ping failed with HTTP Status Code: $HTTP_STATUS"
+            exit 1
+          fi
